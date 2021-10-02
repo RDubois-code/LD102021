@@ -78,6 +78,7 @@ public class PlayerBehaviour : MonoBehaviour
     public void GameOver()
     {
         isPlaying = false;
+        this.myRigidbody.Sleep();
     }
 
     Rigidbody2D myRigidbody;
