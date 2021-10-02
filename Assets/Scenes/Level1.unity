@@ -934,7 +934,7 @@ MonoBehaviour:
   gameOverScreen: {fileID: 4770882443625509874, guid: 6e95af13dc5d57f4d9ca7d9b8cba36e0, type: 3}
   sizeMaxGameOver: 3
   sizeMinGameOver: 0.5
-  nextScene: Level0
+  nextScene: Generique
 --- !u!61 &741335326
 BoxCollider2D:
   m_ObjectHideFlags: 0
