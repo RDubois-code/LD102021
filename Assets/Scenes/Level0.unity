@@ -910,8 +910,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45bf6cd4de3d2f8498e145f551348f83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveForce: 10
+  groundControl: 10
+  airControl: 5
   jumpForce: 100
+  grassMeltingFactor: 0.1
+  snowGrowingFactor: 0.1
+  scale: 1
 --- !u!1 &404165184
 GameObject:
   m_ObjectHideFlags: 0
@@ -1591,6 +1595,8 @@ MonoBehaviour:
   head: {fileID: 548809386}
   mainCamera: {fileID: 77366774}
   victoryScreen: {fileID: 4180995672069393949, guid: cd25eda94d7d00d4f8404bac128f19dc, type: 3}
+  gameOverScreen: {fileID: 4770882443625509874, guid: 6e95af13dc5d57f4d9ca7d9b8cba36e0, type: 3}
+  nextScene: Level1
 --- !u!61 &1201100179
 BoxCollider2D:
   m_ObjectHideFlags: 0

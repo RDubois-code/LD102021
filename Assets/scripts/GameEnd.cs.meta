@@ -3,7 +3,12 @@ guid: 0e5466307cc75cb4992e550b548f8922
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - player: {instanceID: 0}
+  - head: {instanceID: 0}
+  - mainCamera: {instanceID: 0}
+  - victoryScreen: {fileID: 4180995672069393949, guid: cd25eda94d7d00d4f8404bac128f19dc, type: 3}
+  - gameOverScreen: {fileID: 4770882443625509874, guid: 6e95af13dc5d57f4d9ca7d9b8cba36e0, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
