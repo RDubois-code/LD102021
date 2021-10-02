@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class GameEnd : MonoBehaviour
@@ -16,6 +17,18 @@ public class GameEnd : MonoBehaviour
         {
             player.position = head.position;
             player.GetComponent<Rigidbody2D>().Sleep();
+        }
+        if(victory && Input.anyKeyDown)
+        {
+            int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+            if (SceneManager.sceneCount > nextSceneIndex)
+            {
+                SceneManager.LoadScene(nextSceneIndex);
+            }
+            else
+            {
+                SceneManager.LoadScene(0);
+            }
         }
     } 
 
