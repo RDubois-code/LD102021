@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 77366774}
   - component: {fileID: 77366773}
   - component: {fileID: 77366772}
+  - component: {fileID: 77366775}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -206,6 +207,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &77366775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77366771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25838e33e5cd7024bae0f9fe13767b21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: 2, z: -10}
+  target: {fileID: 340591018}
 --- !u!1 &340591014
 GameObject:
   m_ObjectHideFlags: 0
@@ -218,8 +233,9 @@ GameObject:
   - component: {fileID: 340591017}
   - component: {fileID: 340591016}
   - component: {fileID: 340591015}
+  - component: {fileID: 340591019}
   m_Layer: 0
-  m_Name: Snowball_big_0001
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -327,6 +343,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &340591019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 340591014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45bf6cd4de3d2f8498e145f551348f83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveForce: 10
+  jumpForce: 100
 --- !u!1 &404165184
 GameObject:
   m_ObjectHideFlags: 0
