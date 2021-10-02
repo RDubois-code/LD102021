@@ -25,6 +25,13 @@ public class PlayerBehaviour : MonoBehaviour
         this.myRigidbody = this.GetComponent<Rigidbody2D>();
     }
 
+    void Update()
+    {
+        if (Input.GetButtonDown("Cancel"))
+        {
+            SceneManager.LoadScene("Menu");
+        }
+    }
     // FixedUpdate is called at a fixed rate
     void FixedUpdate()
     {
@@ -33,10 +40,7 @@ public class PlayerBehaviour : MonoBehaviour
             HandleMovement();
             HandleScaling();
         }
-        if (Input.GetButtonDown("Cancel"))
-        {
-            SceneManager.LoadScene("Menu");
-        }
+        
     }
 
     void HandleMovement()
