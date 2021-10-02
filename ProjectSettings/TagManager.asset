@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: mediumground
+    uniqueID: 3460080863
+    locked: 0
+  - name: Bakcground
+    uniqueID: 3295499737
+    locked: 0
