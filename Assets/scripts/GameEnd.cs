@@ -10,6 +10,8 @@ public class GameEnd : MonoBehaviour
     public Transform mainCamera;
     public GameObject victoryScreen;
     public GameObject gameOverScreen;
+    public float sizeMaxGameOver = 3f;
+    public float sizeMinGameOver = 0.5f;
     public string nextScene;
 
     bool victory = false;
@@ -17,39 +19,30 @@ public class GameEnd : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (victory)
-        {
-            player.position = head.position;
-            player.GetComponent<Rigidbody2D>().Sleep();
-        }
 
-        if(victory && Input.anyKey)
+        if(victory && Input.anyKeyDown)
         {
-            int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
-
-            if(nextScene != null)
+            
+            if(!string.IsNullOrEmpty(nextScene))
             {
                 SceneManager.LoadScene(nextScene);
             }
             else
             {
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene("Level0");
             }
         }
 
-        if (gameOver && Input.anyKey)
+        if (gameOver && Input.anyKeyDown)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);            
         }
 
-        if (player.gameObject.GetComponent<PlayerBehaviour>().scale < 0.5f)
+        if (!gameOver &&
+            (player.gameObject.GetComponent<PlayerBehaviour>().scale < sizeMinGameOver ||
+            player.gameObject.GetComponent<PlayerBehaviour>().scale > sizeMaxGameOver))
         {
-            gameOver = true;
-            player.GetComponent<Rigidbody2D>().Sleep();
-            Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 3);
-            GameObject.Instantiate(gameOverScreen, vector, Quaternion.identity);
-
-
+            this.GameOver();
         }
 
     } 
@@ -59,9 +52,24 @@ public class GameEnd : MonoBehaviour
 
         if (GameObject.ReferenceEquals(col.gameObject, player.gameObject))
         {
-            this.victory = true;
-            Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 3);
-            GameObject.Instantiate(victoryScreen, vector, Quaternion.identity);
+            this.Victory();
         }
+    }
+
+    public void Victory()
+    {
+        this.victory = true;
+        Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 3);
+        GameObject.Instantiate(victoryScreen, vector, Quaternion.identity);
+        player.position = head.position;
+        player.BroadcastMessage("GameOver");
+    }
+
+    public void GameOver()
+    {
+        this.gameOver = true;
+        player.BroadcastMessage("GameOver");
+        Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 3);
+        GameObject.Instantiate(gameOverScreen, vector, Quaternion.identity);
     }
 }
