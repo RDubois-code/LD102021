@@ -9,10 +9,14 @@ public class PlayerBehaviour : MonoBehaviour
 
     public float jumpForce = 100.0f;
 
-    public float grassMeltingFactor = 0.1f;
-    public float snowGrowingFactor = 0.1f;
+    public float grassMeltingFactor = 0.05f;
+    public float snowGrowingFactor = 0.02f;
+    public float airMeltingFactor = 0.01f;
 
     public float scale = 1.0f;
+
+    public float minScale = 0.1f;
+    public float maxScale = 10.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -23,9 +27,11 @@ public class PlayerBehaviour : MonoBehaviour
     // FixedUpdate is called at a fixed rate
     void FixedUpdate()
     {
-        HandleMovement();
-
-        HandleScaling();
+        if(this.isPlaying)
+        {
+            HandleMovement();
+            HandleScaling();
+        }
     }
 
     void HandleMovement()
@@ -49,16 +55,31 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass")))
         {
-            this.scale -= this.grassMeltingFactor * Time.deltaTime;
+            this.scale -= this.grassMeltingFactor * this.myRigidbody.velocity.magnitude * Time.deltaTime;
         }
         else if (this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Snow")))
         {
-            this.scale += this.snowGrowingFactor * Time.deltaTime;
+            this.scale += this.snowGrowingFactor * this.myRigidbody.velocity.magnitude * Time.deltaTime;
         }
+
+        this.scale -= this.airMeltingFactor * Time.deltaTime;
+
+        this.scale = Mathf.Clamp(this.scale, this.minScale, this.maxScale);
 
         this.transform.localScale = Vector3.one * this.scale;
         this.myRigidbody.mass = this.scale;
     }
 
+    public void GameStart()
+	{
+        isPlaying = true;
+    }
+
+    public void GameOver()
+    {
+        isPlaying = false;
+    }
+
     Rigidbody2D myRigidbody;
+    bool isPlaying = true;
 }
