@@ -66,13 +66,13 @@ public class GameEnd : MonoBehaviour
         Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 5);
         GameObject.Instantiate(victoryScreen, vector, Quaternion.identity);
         player.position = head.position;
-        player.BroadcastMessage("GameOver");
+        player.BroadcastMessage("GameOver", true);
     }
 
     public void GameOver()
     {
         this.gameOver = true;
-        player.BroadcastMessage("GameOver");
+        player.BroadcastMessage("GameOver", false);
         Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 5);
         GameObject.Instantiate(gameOverScreen, vector, Quaternion.identity);
     }

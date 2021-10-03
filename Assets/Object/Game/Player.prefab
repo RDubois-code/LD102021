@@ -146,7 +146,8 @@ MonoBehaviour:
   minScale: 0.1
   maxScale: 10
   minVelocityActivate: 1
-  particlePrefab: {fileID: 6691262535966375663, guid: 268e0c2497da5464bb78a59e7ad09c33, type: 3}
+  rollingParticlePrefab: {fileID: 6691262535966375663, guid: 268e0c2497da5464bb78a59e7ad09c33, type: 3}
+  impactParticlePrefab: {fileID: 6691262535966375663, guid: 2ded526a05aaca74ab831dfbb380ce6c, type: 3}
   rollingAudioSource: {fileID: -6996378981685408423}
   impactAudioSource: {fileID: -8263327094630897426}
   audioAirTime: 0.5

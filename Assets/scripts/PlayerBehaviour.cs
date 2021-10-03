@@ -21,7 +21,9 @@ public class PlayerBehaviour : MonoBehaviour
 
     public float minVelocityActivate = 1f;
 
-    public GameObject particlePrefab;
+    public GameObject rollingParticlePrefab;
+
+    public GameObject impactParticlePrefab;
 
     public AudioSource rollingAudioSource;
     public AudioSource impactAudioSource;
@@ -35,8 +37,13 @@ public class PlayerBehaviour : MonoBehaviour
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody2D>();
-        myParticle = GameObject.Instantiate(particlePrefab);
-        myParticleSystem = myParticle.GetComponent<ParticleSystem>();
+        myCircleCollider = GetComponent<CircleCollider2D>();
+
+        myRollingParticle = GameObject.Instantiate(rollingParticlePrefab);
+        myRollingParticleSystem = myRollingParticle.GetComponent<ParticleSystem>();
+
+        myImpactParticle = GameObject.Instantiate(impactParticlePrefab, transform.position, transform.rotation, transform);
+        myImpactParticleSystem = myImpactParticle.GetComponent<ParticleSystem>();
 
         previousVelocity = new Vector2(0, 0);
     }
@@ -66,7 +73,7 @@ public class PlayerBehaviour : MonoBehaviour
         {
             HandleMovement();
             HandleScaling();
-            HandleParticle();
+            HandleRollingParticle();
             HandleAudio();
 
             previousVelocity = myRigidbody.velocity;
@@ -92,9 +99,7 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 float impactStrength = Mathf.InverseLerp(collisionMinImpact, collisionMaxImpact, impactSpeed);
 
-                SetScale((1 - impactStrength) * scale);
-                impactAudioSource.volume = 0.5f + (impactStrength * 0.5f);
-                impactAudioSource.Play();
+                ApplyCollision(impactStrength);
             }
         }
     }
@@ -134,26 +139,26 @@ public class PlayerBehaviour : MonoBehaviour
         SetScale(newScale);
     }
 
-    void HandleParticle()
+    void HandleRollingParticle()
     {
         float xVelocity = myRigidbody.velocity.x;
-        myParticle.transform.position = transform.position;
+        myRollingParticle.transform.position = transform.position + (Vector3.down * myCircleCollider.radius * scale);
 
         if (xVelocity > minVelocityActivate)
         {
-            PlayParticle();
-            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            PlayRollingParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myRollingParticleSystem.shape;
             shape.rotation = new Vector3(-25, -90, 0);
         }
         else if (xVelocity < -minVelocityActivate)
         {
-            PlayParticle();
-            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            PlayRollingParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myRollingParticleSystem.shape;
             shape.rotation = new Vector3(-25, 90, 0);
         }
         else
         {
-            StopParticle();
+            StopRollingParticle();
         }
     }
 
@@ -194,12 +199,22 @@ public class PlayerBehaviour : MonoBehaviour
         isPlaying = true;
     }
 
-    public void GameOver()
+    public void GameOver(bool victory)
     {
         isPlaying = false;
         myRigidbody.simulated = false;
-        StopParticle();
+        StopRollingParticle();
         StopAudio();
+
+        if(!victory)
+        {
+            impactAudioSource.volume = 1.0f;
+            impactAudioSource.Play();
+
+            myImpactParticleSystem.Play();
+
+            this.gameObject.SetActive(false);
+        }
     }
 
 bool IsMoving()
@@ -213,18 +228,18 @@ bool IsMoving()
         return myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass", "Snow"));
     }
 
-    void PlayParticle()
+    void PlayRollingParticle()
     {
-       if (myParticleSystem.isStopped)
+       if (myRollingParticleSystem.isStopped)
         {
-            myParticleSystem.Play();
+            myRollingParticleSystem.Play();
         }
     }
-    void StopParticle()
+    void StopRollingParticle()
     {
-        if (myParticleSystem.isPlaying)
+        if (myRollingParticleSystem.isPlaying)
         {
-            myParticleSystem.Stop();
+            myRollingParticleSystem.Stop();
         }
     }
 
@@ -236,9 +251,24 @@ bool IsMoving()
         }
     }
 
+    void ApplyCollision(float impactStrength)
+    {
+        SetScale((1 - impactStrength) * scale);
+
+        impactAudioSource.volume = 0.5f + (impactStrength * 0.5f);
+        impactAudioSource.Play();
+
+        myImpactParticleSystem.Play();
+    }
+
     Rigidbody2D myRigidbody;
-    ParticleSystem myParticleSystem;
-    GameObject myParticle;
+    CircleCollider2D myCircleCollider;
+
+    GameObject myRollingParticle;
+    ParticleSystem myRollingParticleSystem;
+
+    GameObject myImpactParticle;
+    ParticleSystem myImpactParticleSystem;
 
     bool isPlaying = true;
 
