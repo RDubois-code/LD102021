@@ -144,7 +144,7 @@ MonoBehaviour:
   airMeltingFactor: 0.01
   scale: 1
   minScale: 0.1
-  maxScale: 10
+  maxScale: 2
   minVelocityActivate: 1
   rollingParticlePrefab: {fileID: 6691262535966375663, guid: 268e0c2497da5464bb78a59e7ad09c33, type: 3}
   impactParticlePrefab: {fileID: 6691262535966375663, guid: 2ded526a05aaca74ab831dfbb380ce6c, type: 3}
