@@ -213,7 +213,7 @@ public class PlayerBehaviour : MonoBehaviour
 
             myImpactParticleSystem.Play();
 
-            this.gameObject.SetActive(false);
+            this.GetComponent<SpriteRenderer>().enabled = false;
         }
     }
 
