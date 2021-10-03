@@ -19,6 +19,12 @@ public class PlayerBehaviour : MonoBehaviour
     public float minScale = 0.1f;
     public float maxScale = 10.0f;
 
+    public float minVelocityActivate = 1f;
+
+    public GameObject particlePrefab;
+    public AudioSource audioSource;
+
+
     public float collisionDeadZone = 5.0f;
     public float collisionImpact = 0.2f;
 
@@ -26,6 +32,9 @@ public class PlayerBehaviour : MonoBehaviour
     void Start()
     {
         this.myRigidbody = this.GetComponent<Rigidbody2D>();
+        this.myParticle = GameObject.Instantiate(particlePrefab);
+        this.myParticleSystem = myParticle.GetComponent<ParticleSystem>();
+
     }
 
     // Update is called once per frame
@@ -53,6 +62,12 @@ public class PlayerBehaviour : MonoBehaviour
         {
             HandleMovement();
             HandleScaling();
+            handleParticle();
+        }
+
+        if (isMoving() && !audioSource.isPlaying && this.isPlaying)
+        {
+            audioSource.Play();
         }
     }
 
@@ -109,10 +124,59 @@ public class PlayerBehaviour : MonoBehaviour
     {
         isPlaying = false;
         this.myRigidbody.simulated = false;
+        stopParticle();
+    }
+
+    void handleParticle()
+    {
+        float xVelocity = this.myRigidbody.velocity.x;
+        myParticle.transform.position = this.transform.position;
+         
+        if (xVelocity > minVelocityActivate)
+        {
+            playParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            shape.rotation = new Vector3(-25, -90, 0);
+        }
+        else if (xVelocity < -minVelocityActivate)
+        {
+            playParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            shape.rotation = new Vector3(-25, 90, 0);
+        }
+        else
+        {
+            stopParticle();
+            
+        }
+    }
+
+     bool isMoving()
+    {
+        float xVelocity = this.myRigidbody.velocity.x;
+        return xVelocity > minVelocityActivate || xVelocity < -minVelocityActivate;
+    }
+
+    void playParticle()
+    {
+       if (myParticleSystem.isStopped)
+        {
+            myParticleSystem.Play();
+        }
+    }
+    void stopParticle()
+    {
+        if (myParticleSystem.isPlaying)
+        {
+            myParticleSystem.Stop();
+        }
+        
     }
 
     Rigidbody2D myRigidbody;
+    ParticleSystem myParticleSystem;
     bool isPlaying = true;
+    GameObject myParticle;
 
     bool jumpButton = false;
     float horizontalMove = 0.0f;

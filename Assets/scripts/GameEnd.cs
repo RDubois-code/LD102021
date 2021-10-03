@@ -17,13 +17,16 @@ public class GameEnd : MonoBehaviour
     bool victory = false;
     bool gameOver = false;
 
-    void FixedUpdate()
+    void Update()
     {
-
-        if(victory && Input.anyKeyDown)
+        if (gameOver && Input.anyKeyDown)
         {
-            
-            if(!string.IsNullOrEmpty(nextScene))
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        if (victory && Input.anyKeyDown)
+        {
+
+            if (!string.IsNullOrEmpty(nextScene))
             {
                 SceneManager.LoadScene(nextScene);
             }
@@ -32,19 +35,20 @@ public class GameEnd : MonoBehaviour
                 SceneManager.LoadScene("Level0");
             }
         }
-
-        if (gameOver && Input.anyKeyDown)
+        if (Input.GetButtonDown("Restart"))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);            
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+    }
 
+    void FixedUpdate()
+    {
         if (!gameOver &&
             (player.gameObject.GetComponent<PlayerBehaviour>().scale < sizeMinGameOver ||
             player.gameObject.GetComponent<PlayerBehaviour>().scale > sizeMaxGameOver))
         {
             this.GameOver();
         }
-
     } 
 
     void OnTriggerEnter2D(Collider2D col)
@@ -59,7 +63,7 @@ public class GameEnd : MonoBehaviour
     public void Victory()
     {
         this.victory = true;
-        Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 3);
+        Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 5);
         GameObject.Instantiate(victoryScreen, vector, Quaternion.identity);
         player.position = head.position;
         player.BroadcastMessage("GameOver");
@@ -69,7 +73,7 @@ public class GameEnd : MonoBehaviour
     {
         this.gameOver = true;
         player.BroadcastMessage("GameOver");
-        Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 3);
+        Vector3 vector = new Vector3(mainCamera.position.x, mainCamera.position.y, this.transform.position.z - 5);
         GameObject.Instantiate(gameOverScreen, vector, Quaternion.identity);
     }
 }

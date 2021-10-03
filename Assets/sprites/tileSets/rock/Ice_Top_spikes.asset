@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Ice_platform
+  m_Name: Ice_Top_spikes
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300056, guid: 5afbff6f96636d34d801464d3179b7d2, type: 3}
-  m_Color: {r: 0.49803925, g: 0.49803925, b: 0.49803925, a: 1}
+  m_Sprite: {fileID: 21300080, guid: 5afbff6f96636d34d801464d3179b7d2, type: 3}
+  m_Color: {r: 0.49803922, g: 0.49803922, b: 0.49803922, a: 1}
   m_Transform:
     e00: 1
     e01: 0
