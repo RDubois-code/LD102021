@@ -21,7 +21,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     public float minVelocityActivate = 1f;
 
-     public GameObject particlePrefab;
+    public GameObject particlePrefab;
+    public AudioSource audioSource;
 
 
     // Start is called before the first frame update
@@ -53,7 +54,10 @@ public class PlayerBehaviour : MonoBehaviour
         {
             stopParticle();
         }
-
+        if (isMoving() && !audioSource.isPlaying && this.isPlaying)
+        {
+            audioSource.Play();
+        }
 
 
     }
@@ -129,6 +133,12 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+     bool isMoving()
+    {
+        float xVelocity = this.myRigidbody.velocity.x;
+        return xVelocity > minVelocityActivate || xVelocity < -minVelocityActivate;
+    }
+
     void playParticle()
     {
        if (myParticleSystem.isStopped)
@@ -142,6 +152,7 @@ public class PlayerBehaviour : MonoBehaviour
         {
             myParticleSystem.Stop();
         }
+        
     }
 
     Rigidbody2D myRigidbody;
