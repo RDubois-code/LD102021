@@ -147,6 +147,8 @@ MonoBehaviour:
   minVelocityActivate: 1
   particlePrefab: {fileID: 6691262535966375663, guid: 268e0c2497da5464bb78a59e7ad09c33, type: 3}
   audioSource: {fileID: -6996378981685408423}
+  collisionMinImpact: 5
+  collisionMaxImpact: 30
 --- !u!82 &-6996378981685408423
 AudioSource:
   m_ObjectHideFlags: 0
