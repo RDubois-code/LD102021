@@ -25,8 +25,8 @@ public class PlayerBehaviour : MonoBehaviour
     public AudioSource audioSource;
 
 
-    public float collisionDeadZone = 5.0f;
-    public float collisionImpact = 0.2f;
+    public float collisionMinImpact = 5.0f;
+    public float collisionMaxImpact = 20.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +35,7 @@ public class PlayerBehaviour : MonoBehaviour
         this.myParticle = GameObject.Instantiate(particlePrefab);
         this.myParticleSystem = myParticle.GetComponent<ParticleSystem>();
 
+        previousVelocity = new Vector2(0, 0);
     }
 
     // Update is called once per frame
@@ -63,6 +64,8 @@ public class PlayerBehaviour : MonoBehaviour
             HandleMovement();
             HandleScaling();
             handleParticle();
+
+            previousVelocity = this.myRigidbody.velocity;
         }
 
         if (isMoving() && !audioSource.isPlaying && this.isPlaying)
@@ -91,28 +94,50 @@ public class PlayerBehaviour : MonoBehaviour
 
     void HandleScaling()
     {
+        float newScale = this.scale;
         if (this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Snow")))
         {
-            this.scale += this.snowGrowingFactor * this.myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
+            newScale += this.snowGrowingFactor * this.myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
         }
         else if (this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass")))
         {
-            this.scale -= this.grassMeltingFactor * this.myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
+            newScale -= this.grassMeltingFactor * this.myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
         }
 
-        this.scale -= this.airMeltingFactor * Time.fixedDeltaTime;
+        newScale -= this.airMeltingFactor * Time.fixedDeltaTime;
 
-        this.scale = Mathf.Clamp(this.scale, this.minScale, this.maxScale);
-
-        this.transform.localScale = Vector3.one * this.scale;
-        this.myRigidbody.mass = this.scale;
+        SetScale(newScale);
     }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.relativeVelocity.magnitude > this.collisionDeadZone)
-		{
-            this.scale = this.scale - (this.collisionImpact * this.scale);
+        ContactPoint2D[] contactPoints = new ContactPoint2D[collision.contactCount];
+        collision.GetContacts(contactPoints);
+
+        Vector2 collisionNormal = new Vector2(0, 0);
+        foreach (ContactPoint2D contact in contactPoints)
+        {
+            collisionNormal = collisionNormal + contact.normal;
         }
+
+        if(collisionNormal.SqrMagnitude() > Mathf.Epsilon)
+		{
+            collisionNormal.Normalize();
+            float impactSpeed = - Vector2.Dot(collisionNormal, previousVelocity);
+            if(impactSpeed > collisionMinImpact)
+			{
+                float impactStrength = Mathf.InverseLerp(collisionMinImpact, collisionMaxImpact, impactSpeed);
+
+                SetScale((1 - impactStrength) * this.scale);
+			}
+        }
+    }
+
+    void SetScale(float newScale)
+    {
+        this.scale = Mathf.Clamp(newScale, this.minScale, this.maxScale);
+        this.transform.localScale = Vector3.one * this.scale;
+        this.myRigidbody.mass = this.scale;
     }
 
     public void GameStart()
@@ -147,7 +172,6 @@ public class PlayerBehaviour : MonoBehaviour
         else
         {
             stopParticle();
-            
         }
     }
 
@@ -170,7 +194,6 @@ public class PlayerBehaviour : MonoBehaviour
         {
             myParticleSystem.Stop();
         }
-        
     }
 
     Rigidbody2D myRigidbody;
@@ -180,4 +203,6 @@ public class PlayerBehaviour : MonoBehaviour
 
     bool jumpButton = false;
     float horizontalMove = 0.0f;
+
+    Vector2 previousVelocity;
 }
