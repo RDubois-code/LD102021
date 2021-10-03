@@ -35,6 +35,10 @@ public class GameEnd : MonoBehaviour
                 SceneManager.LoadScene("Level0");
             }
         }
+        if (Input.GetButtonDown("Restart"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     void FixedUpdate()

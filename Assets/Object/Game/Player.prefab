@@ -143,3 +143,5 @@ MonoBehaviour:
   scale: 1
   minScale: 0.1
   maxScale: 10
+  minVelocityActivate: 1
+  particlePrefab: {fileID: 6691262535966375663, guid: 268e0c2497da5464bb78a59e7ad09c33, type: 3}

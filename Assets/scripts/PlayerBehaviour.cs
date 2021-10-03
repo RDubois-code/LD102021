@@ -19,10 +19,18 @@ public class PlayerBehaviour : MonoBehaviour
     public float minScale = 0.1f;
     public float maxScale = 10.0f;
 
+    public float minVelocityActivate = 1f;
+
+     public GameObject particlePrefab;
+
+
     // Start is called before the first frame update
     void Start()
     {
         this.myRigidbody = this.GetComponent<Rigidbody2D>();
+        this.myParticle = GameObject.Instantiate(particlePrefab);
+        this.myParticleSystem = myParticle.GetComponent<ParticleSystem>();
+
     }
 
     void Update()
@@ -39,8 +47,15 @@ public class PlayerBehaviour : MonoBehaviour
         {
             HandleMovement();
             HandleScaling();
+            handleParticle();
         }
-        
+        else
+        {
+            stopParticle();
+        }
+
+
+
     }
 
     void HandleMovement()
@@ -90,6 +105,47 @@ public class PlayerBehaviour : MonoBehaviour
         this.myRigidbody.simulated = false;
     }
 
+    void handleParticle()
+    {
+        float xVelocity = this.myRigidbody.velocity.x;
+        myParticle.transform.position = this.transform.position;
+         
+        if (xVelocity > minVelocityActivate)
+        {
+            playParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            shape.rotation = new Vector3(-25, -90, 0);
+        }
+        else if (xVelocity < -minVelocityActivate)
+        {
+            playParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            shape.rotation = new Vector3(-25, 90, 0);
+        }
+        else
+        {
+            stopParticle();
+            
+        }
+    }
+
+    void playParticle()
+    {
+       if (myParticleSystem.isStopped)
+        {
+            myParticleSystem.Play();
+        }
+    }
+    void stopParticle()
+    {
+        if (myParticleSystem.isPlaying)
+        {
+            myParticleSystem.Stop();
+        }
+    }
+
     Rigidbody2D myRigidbody;
+    ParticleSystem myParticleSystem;
     bool isPlaying = true;
+    GameObject myParticle;
 }
