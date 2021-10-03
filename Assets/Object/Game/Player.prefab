@@ -151,7 +151,7 @@ MonoBehaviour:
   impactAudioSource: {fileID: -8263327094630897426}
   audioAirTime: 0.5
   collisionMinImpact: 5
-  collisionMaxImpact: 20
+  collisionMaxImpact: 30
 --- !u!82 &-6996378981685408423
 AudioSource:
   m_ObjectHideFlags: 0
