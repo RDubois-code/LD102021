@@ -150,7 +150,7 @@ MonoBehaviour:
   rollingAudioSource: {fileID: -6996378981685408423}
   impactAudioSource: {fileID: -8263327094630897426}
   audioAirTime: 0.5
-  collisionMinImpact: 5
+  collisionMinImpact: 8
   collisionMaxImpact: 30
 --- !u!82 &-6996378981685408423
 AudioSource:

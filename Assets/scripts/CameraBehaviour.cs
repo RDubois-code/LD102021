@@ -6,20 +6,20 @@ public class CameraBehaviour : MonoBehaviour
 {
     public Vector3 offset;
 
-    public float maxHorizontalLag = 1;
+    public float maxShiftUp = 2.0f;
+    public float maxShiftDown = 2.0f;
 
-    public float maxSpring = 0.5f;
-    public float springFactor = 3;
+    public float maxSpring = 4.0f;
+    public float springFactor = 3.0f;
 
-    public float maxShiftUp = 0.5f;
-    public float maxShiftDown = 0.5f;
-
-    public Transform target;
+    public float maxProjection = 4.0f;
+    public float maxProjectedVelocity = 10.0f;
 
     // Start is called before the first frame update
     void Start()
     {
-        this.transform.position = target.position + offset;
+        targetRigidBody = GameObject.Find("Player").GetComponent<Rigidbody2D>();
+        transform.position = targetRigidBody.transform.position + offset;
     }
 
     // Update is called once per frame
@@ -32,13 +32,21 @@ public class CameraBehaviour : MonoBehaviour
     // FixedUpdate is called at a fixed rate
     void FixedUpdate()
     {
-        Vector3 targetPosition = target.position + offset + Vector3.up * verticalMove;
+        Vector3 targetPosition = targetRigidBody.transform.position + offset;
 
-        targetPosition.x = Mathf.Clamp(this.transform.position.x, (targetPosition.x - maxHorizontalLag), (targetPosition.x + maxHorizontalLag));
-        this.transform.position = new Vector3(Interp(this.transform.position.x, targetPosition.x, Time.fixedDeltaTime), Interp(this.transform.position.y, targetPosition.y, Time.fixedDeltaTime), Interp(this.transform.position.z, targetPosition.z, Time.fixedDeltaTime));
+        if ((maxProjection > 0) && (maxProjectedVelocity > 0))
+        {
+            Vector2 clampedVelocity = (targetRigidBody.velocity.magnitude > maxProjectedVelocity) ? (targetRigidBody.velocity * (maxProjection / targetRigidBody.velocity.magnitude)) : targetRigidBody.velocity;
+            Vector3 desiredProjection = new Vector3((clampedVelocity.x * (maxProjection / maxProjectedVelocity)), (clampedVelocity.y * (maxProjection / maxProjectedVelocity)), 0);
+            projection = SpringInter(projection, desiredProjection, Time.fixedDeltaTime);
+        }
+
+        Vector3 desiredPosition = targetPosition + projection + (Vector3.up * verticalMove);
+
+        transform.position = SpringInter(transform.position, desiredPosition, Time.fixedDeltaTime);
     }
 
-    float Interp(float current, float target, float deltaTime)
+    float SpringInter(float current, float target, float deltaTime)
 	{
         if((deltaTime > 0) && !Mathf.Approximately((current - target), 0) && (springFactor > 0))
         {
@@ -52,7 +60,15 @@ public class CameraBehaviour : MonoBehaviour
 		{
             return target;
         }
-	}
+    }
+    Vector3 SpringInter(Vector3 current, Vector3 target, float deltaTime)
+    {
+        return new Vector3(SpringInter(current.x, target.x, deltaTime), SpringInter(current.y, target.y, deltaTime), SpringInter(current.z, target.z, deltaTime));
+    }
+
+    public Rigidbody2D targetRigidBody;
+
+    Vector3 projection;
 
     float verticalMove = 0.0f;
 }

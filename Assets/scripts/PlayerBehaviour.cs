@@ -34,9 +34,9 @@ public class PlayerBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.myRigidbody = this.GetComponent<Rigidbody2D>();
-        this.myParticle = GameObject.Instantiate(particlePrefab);
-        this.myParticleSystem = myParticle.GetComponent<ParticleSystem>();
+        myRigidbody = GetComponent<Rigidbody2D>();
+        myParticle = GameObject.Instantiate(particlePrefab);
+        myParticleSystem = myParticle.GetComponent<ParticleSystem>();
 
         previousVelocity = new Vector2(0, 0);
     }
@@ -62,14 +62,14 @@ public class PlayerBehaviour : MonoBehaviour
     // FixedUpdate is called at a fixed rate
     void FixedUpdate()
     {
-        if(this.isPlaying)
+        if(isPlaying)
         {
             HandleMovement();
             HandleScaling();
             HandleParticle();
             HandleAudio();
 
-            previousVelocity = this.myRigidbody.velocity;
+            previousVelocity = myRigidbody.velocity;
         }
     }
 
@@ -92,7 +92,7 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 float impactStrength = Mathf.InverseLerp(collisionMinImpact, collisionMaxImpact, impactSpeed);
 
-                SetScale((1 - impactStrength) * this.scale);
+                SetScale((1 - impactStrength) * scale);
                 impactAudioSource.volume = 0.5f + (impactStrength * 0.5f);
                 impactAudioSource.Play();
             }
@@ -103,41 +103,41 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if(IsOnGround())
         {
-            this.myRigidbody.AddForce(Vector3.right * horizontalMove * this.groundControl);
+            myRigidbody.AddForce(Vector3.right * horizontalMove * groundControl);
 
-            if(this.jumpButton)
+            if(jumpButton)
 			{
-                this.myRigidbody.AddForce(Vector3.up * this.jumpForce);
-                this.jumpButton = false;
+                myRigidbody.AddForce(Vector3.up * jumpForce);
+                jumpButton = false;
             }
         }
         else
 		{
-            this.myRigidbody.AddForce(Vector3.right * horizontalMove * this.airControl);
+            myRigidbody.AddForce(Vector3.right * horizontalMove * airControl);
         }
     }
 
     void HandleScaling()
     {
-        float newScale = this.scale;
-        if (this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Snow")))
+        float newScale = scale;
+        if (myRigidbody.IsTouchingLayers(LayerMask.GetMask("Snow")))
         {
-            newScale += this.snowGrowingFactor * this.myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
+            newScale += snowGrowingFactor * myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
         }
-        else if (this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass")))
+        else if (myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass")))
         {
-            newScale -= this.grassMeltingFactor * this.myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
+            newScale -= grassMeltingFactor * myRigidbody.velocity.magnitude * Time.fixedDeltaTime;
         }
 
-        newScale -= this.airMeltingFactor * Time.fixedDeltaTime;
+        newScale -= airMeltingFactor * Time.fixedDeltaTime;
 
         SetScale(newScale);
     }
 
     void HandleParticle()
     {
-        float xVelocity = this.myRigidbody.velocity.x;
-        myParticle.transform.position = this.transform.position;
+        float xVelocity = myRigidbody.velocity.x;
+        myParticle.transform.position = transform.position;
 
         if (xVelocity > minVelocityActivate)
         {
@@ -183,10 +183,10 @@ public class PlayerBehaviour : MonoBehaviour
 
     void SetScale(float newScale)
     {
-        this.scale = Mathf.Clamp(newScale, this.minScale, this.maxScale);
+        scale = Mathf.Clamp(newScale, minScale, maxScale);
 
-        this.transform.localScale = Vector3.one * this.scale;
-        this.myRigidbody.mass = this.scale;
+        transform.localScale = Vector3.one * scale;
+        myRigidbody.mass = scale;
     }
 
     public void GameStart()
@@ -197,20 +197,20 @@ public class PlayerBehaviour : MonoBehaviour
     public void GameOver()
     {
         isPlaying = false;
-        this.myRigidbody.simulated = false;
+        myRigidbody.simulated = false;
         StopParticle();
         StopAudio();
     }
 
 bool IsMoving()
     {
-        float xVelocity = this.myRigidbody.velocity.x;
+        float xVelocity = myRigidbody.velocity.x;
         return xVelocity > minVelocityActivate || xVelocity < -minVelocityActivate;
     }
 
     bool IsOnGround()
 	{
-        return this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass", "Snow"));
+        return myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass", "Snow"));
     }
 
     void PlayParticle()
