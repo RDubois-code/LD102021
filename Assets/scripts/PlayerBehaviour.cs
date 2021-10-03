@@ -22,9 +22,12 @@ public class PlayerBehaviour : MonoBehaviour
     public float minVelocityActivate = 1f;
 
     public GameObject particlePrefab;
-    public AudioSource audioSource;
 
+    public AudioSource rollingAudioSource;
+    public AudioSource impactAudioSource;
 
+    public float audioAirTime = 0.5f;
+    
     public float collisionMinImpact = 5.0f;
     public float collisionMaxImpact = 20.0f;
 
@@ -63,20 +66,42 @@ public class PlayerBehaviour : MonoBehaviour
         {
             HandleMovement();
             HandleScaling();
-            handleParticle();
+            HandleParticle();
+            HandleAudio();
 
             previousVelocity = this.myRigidbody.velocity;
         }
+    }
 
-        if (isMoving() && !audioSource.isPlaying && this.isPlaying)
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        ContactPoint2D[] contactPoints = new ContactPoint2D[collision.contactCount];
+        collision.GetContacts(contactPoints);
+
+        Vector2 collisionNormal = new Vector2(0, 0);
+        foreach (ContactPoint2D contact in contactPoints)
         {
-            audioSource.Play();
+            collisionNormal = collisionNormal + contact.normal;
+        }
+
+        if (collisionNormal.SqrMagnitude() > Mathf.Epsilon)
+        {
+            collisionNormal.Normalize();
+            float impactSpeed = -Vector2.Dot(collisionNormal, previousVelocity);
+            if (impactSpeed > collisionMinImpact)
+            {
+                float impactStrength = Mathf.InverseLerp(collisionMinImpact, collisionMaxImpact, impactSpeed);
+
+                SetScale((1 - impactStrength) * this.scale);
+                impactAudioSource.volume = 0.5f + (impactStrength * 0.5f);
+                impactAudioSource.Play();
+            }
         }
     }
 
     void HandleMovement()
     {
-        if(this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass", "Snow")))
+        if(IsOnGround())
         {
             this.myRigidbody.AddForce(Vector3.right * horizontalMove * this.groundControl);
 
@@ -109,33 +134,57 @@ public class PlayerBehaviour : MonoBehaviour
         SetScale(newScale);
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void HandleParticle()
     {
-        ContactPoint2D[] contactPoints = new ContactPoint2D[collision.contactCount];
-        collision.GetContacts(contactPoints);
+        float xVelocity = this.myRigidbody.velocity.x;
+        myParticle.transform.position = this.transform.position;
 
-        Vector2 collisionNormal = new Vector2(0, 0);
-        foreach (ContactPoint2D contact in contactPoints)
+        if (xVelocity > minVelocityActivate)
         {
-            collisionNormal = collisionNormal + contact.normal;
+            PlayParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            shape.rotation = new Vector3(-25, -90, 0);
+        }
+        else if (xVelocity < -minVelocityActivate)
+        {
+            PlayParticle();
+            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
+            shape.rotation = new Vector3(-25, 90, 0);
+        }
+        else
+        {
+            StopParticle();
+        }
+    }
+
+    void HandleAudio()
+    {
+        if (IsOnGround())
+        {
+            lastGroundContact = Time.fixedTime;
         }
 
-        if(collisionNormal.SqrMagnitude() > Mathf.Epsilon)
-		{
-            collisionNormal.Normalize();
-            float impactSpeed = - Vector2.Dot(collisionNormal, previousVelocity);
-            if(impactSpeed > collisionMinImpact)
-			{
-                float impactStrength = Mathf.InverseLerp(collisionMinImpact, collisionMaxImpact, impactSpeed);
+        bool audioInAir = ((Time.fixedTime - lastGroundContact) >= audioAirTime);
 
-                SetScale((1 - impactStrength) * this.scale);
-			}
+        if (IsMoving() && !audioInAir)
+        {
+            if (!rollingAudioSource.isPlaying)
+            {
+                rollingAudioSource.Play();
+            }
+
+            rollingAudioSource.mute = false;
+        }
+        else
+        {
+            rollingAudioSource.mute = true;
         }
     }
 
     void SetScale(float newScale)
     {
         this.scale = Mathf.Clamp(newScale, this.minScale, this.maxScale);
+
         this.transform.localScale = Vector3.one * this.scale;
         this.myRigidbody.mass = this.scale;
     }
@@ -149,46 +198,29 @@ public class PlayerBehaviour : MonoBehaviour
     {
         isPlaying = false;
         this.myRigidbody.simulated = false;
-        stopParticle();
+        StopParticle();
+        StopAudio();
     }
 
-    void handleParticle()
-    {
-        float xVelocity = this.myRigidbody.velocity.x;
-        myParticle.transform.position = this.transform.position;
-         
-        if (xVelocity > minVelocityActivate)
-        {
-            playParticle();
-            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
-            shape.rotation = new Vector3(-25, -90, 0);
-        }
-        else if (xVelocity < -minVelocityActivate)
-        {
-            playParticle();
-            UnityEngine.ParticleSystem.ShapeModule shape = myParticleSystem.shape;
-            shape.rotation = new Vector3(-25, 90, 0);
-        }
-        else
-        {
-            stopParticle();
-        }
-    }
-
-     bool isMoving()
+bool IsMoving()
     {
         float xVelocity = this.myRigidbody.velocity.x;
         return xVelocity > minVelocityActivate || xVelocity < -minVelocityActivate;
     }
 
-    void playParticle()
+    bool IsOnGround()
+	{
+        return this.myRigidbody.IsTouchingLayers(LayerMask.GetMask("Grass", "Snow"));
+    }
+
+    void PlayParticle()
     {
        if (myParticleSystem.isStopped)
         {
             myParticleSystem.Play();
         }
     }
-    void stopParticle()
+    void StopParticle()
     {
         if (myParticleSystem.isPlaying)
         {
@@ -196,13 +228,24 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    void StopAudio()
+	{
+        if (rollingAudioSource.isPlaying)
+        {
+            rollingAudioSource.Stop();
+        }
+    }
+
     Rigidbody2D myRigidbody;
     ParticleSystem myParticleSystem;
-    bool isPlaying = true;
     GameObject myParticle;
+
+    bool isPlaying = true;
 
     bool jumpButton = false;
     float horizontalMove = 0.0f;
+
+    float lastGroundContact = 0.0f;
 
     Vector2 previousVelocity;
 }
