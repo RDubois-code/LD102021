@@ -7699,7 +7699,7 @@ PrefabInstance:
       objectReference: {fileID: 1799817396}
     - target: {fileID: 4462678997315661100, guid: 3296b1717702b644c9e607c279ce90f9, type: 3}
       propertyPath: nextScene
-      value: Level3
+      value: Generique
       objectReference: {fileID: 0}
     - target: {fileID: 4462678997315661100, guid: 3296b1717702b644c9e607c279ce90f9, type: 3}
       propertyPath: mainCamera

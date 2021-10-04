@@ -8,6 +8,7 @@ public class PlayerBehaviour : MonoBehaviour
     public float groundControl = 10.0f;
     public float airControl = 5.0f;
 
+    public float airJump = 0.2f;
     public float jumpForce = 100.0f;
 
     public float grassMeltingFactor = 0.05f;
@@ -106,7 +107,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     void HandleMovement()
     {
-        if(IsOnGround())
+        if(IsOnGround() || ((Time.fixedTime - lastGroundContact) < airJump))
         {
             myRigidbody.AddForce(Vector3.right * horizontalMove * groundControl);
 
@@ -114,6 +115,7 @@ public class PlayerBehaviour : MonoBehaviour
 			{
                 myRigidbody.AddForce(Vector3.up * jumpForce);
                 jumpButton = false;
+                lastGroundContact = 0;
             }
         }
         else
