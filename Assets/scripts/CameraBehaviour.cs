@@ -50,9 +50,8 @@ public class CameraBehaviour : MonoBehaviour
 	{
         if((deltaTime > 0) && !Mathf.Approximately((current - target), 0) && (springFactor > 0))
         {
-            float dist = (target - current);
-            float sqrDist = dist * dist;
-            float interpolatedValue = current + Mathf.Lerp(0, sqrDist, (deltaTime * springFactor)) / dist;
+            float interpolationFactor = 1 - Mathf.Pow((1 - Mathf.Clamp(deltaTime, 0, 1)), springFactor);
+            float interpolatedValue = Mathf.Lerp(current, target, interpolationFactor);
 
             return Mathf.Clamp(interpolatedValue, (target - maxSpring), (target + maxSpring));
         }
